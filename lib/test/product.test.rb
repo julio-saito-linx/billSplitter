@@ -1,18 +1,20 @@
-require "../product"
+require "product"
 require "test/unit"
+require "redgreen"
+
 
 class TestProduct < Test::Unit::TestCase
 
   def setup
-    @product1 = Product.new("Pedaco de Pizza de Mussarela")
+    @product1 = Product.new("Pedaco de Pizza de Mussarela", 10)
   end
 
   def test_must_have_a_description
     assert_not_nil(@product1.description)
   end
 
-  def test_unit_price_is_zero_at_start
-    assert_equal(0, @product1.unit_price)
+  def test_unit_price_have_a_value
+    assert_equal(10, @product1.unit_price)
   end
 
   def test_unit_price_can_be_changed

@@ -1,8 +1,9 @@
-require "../person"
-require "../place"
-require "../product"
-require "../event"
+require "person"
+require "place"
+require "product"
+require "event"
 require "test/unit"
+require "redgreen"
 
 class TestEvent < Test::Unit::TestCase
 
@@ -11,12 +12,12 @@ class TestEvent < Test::Unit::TestCase
 
     @event1.place = Place.new("Elevados Mountain")
 
-    @event1.persons.unshift(Person.new("Paul Mac"))
-    @event1.persons.unshift(Person.new("Will Jack"))
+    @event1.add_person("Paul Mac")
+    @event1.add_person("Will Jack")
 
-    @event1.products.unshift(Product.new("Sandwich"))
-    @event1.products.unshift(Product.new("Water"))
-    @event1.products.unshift(Product.new("Beer"))
+    @event1.add_product("Sandwich", 4)
+    @event1.add_product("Water", 5)
+    @event1.add_product("Beer", 6)
   end
 
   def test_must_have_a_name

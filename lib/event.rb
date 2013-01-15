@@ -6,4 +6,14 @@ class Event
     @persons = []
     @products = []
   end
+
+  def add_person(name)
+    p1 = Person.new(name)
+    @persons.unshift(p1)
+  end
+
+  def add_product(name, price)
+    p1 = Product.new(name, price)
+    @products.unshift(p1)
+  end
 end

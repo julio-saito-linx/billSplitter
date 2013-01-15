@@ -1,5 +1,7 @@
-require "../person"
+require "person"
 require "test/unit"
+require "redgreen"
+
 
 class TestPerson < Test::Unit::TestCase
 

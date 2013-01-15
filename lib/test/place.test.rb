@@ -1,5 +1,7 @@
-require "../place"
+require "place"
 require "test/unit"
+require "redgreen"
+
 
 class TestPlace < Test::Unit::TestCase
 
