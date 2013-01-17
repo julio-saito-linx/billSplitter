@@ -11,10 +11,11 @@ class TestEvent < Test::Unit::TestCase
   def setup
     @event1 = Event.new("Joana's birthday")
 
-    @event1.place = Place.new("Elevados Mountain")
+    @event1.place = Place.new("Elevateds Mountains")
 
     @event1.add_person("Paul")
     @event1.add_person("Will")
+    @event1.add_person("Jane")
 
     @event1.add_item("Sandwich", 4.0, 2)
     @event1.add_item("Water", 5.0, 2)
@@ -30,7 +31,7 @@ class TestEvent < Test::Unit::TestCase
   end
 
   def test_there_are_two_persons
-    assert_equal(2, @event1.persons.count)
+    assert_equal(3, @event1.persons.count)
   end
 
   def test_three_products_were_inserted
@@ -41,8 +42,13 @@ class TestEvent < Test::Unit::TestCase
     assert_equal(66.0, @event1.total)
   end
 
+  def test_event_total_consumed_plus_tips
+    @event1.tips = 0.1
+    assert_equal(72.6, @event1.total)
+  end
+
   def test_Paul_eated_a_sandwich
-    @event1.add_person_item("Paul", 1, "Sandwich")
+    @event1.add_person_item("Paul", :quantity, 1, "Sandwich")
 
     person_item1 = @event1.persons_itens[0]
     assert_equal("Paul",     person_item1.person.name)
@@ -50,34 +56,66 @@ class TestEvent < Test::Unit::TestCase
   end
 
   def test_Paul_eated_one_more_sandwich
-    @event1.add_person_item("Paul", 1, "Sandwich")
-    @event1.add_person_item("Paul", 1, "Sandwich")
+    @event1.add_person_item("Paul", :quantity, 1, "Sandwich")
+    @event1.add_person_item("Paul", :quantity, 1, "Sandwich")
 
     person_item1 = @event1.persons_itens[0]
-    assert_equal(2, person_item1.count)
+    assert_equal(:quantity, person_item1.share_type)
+    assert_equal(2, person_item1.share_value)
   end
 
   def test_Paul_total_only_sandwiches
-    @event1.add_person_item("Paul", 1, "Sandwich")
-    @event1.add_person_item("Paul", 1, "Sandwich")
+    @event1.add_person_item("Paul", :quantity, 1, "Sandwich")
+    @event1.add_person_item("Paul", :quantity, 1, "Sandwich")
 
     person_item1 = @event1.persons_itens[0]
-    assert_equal(8.0, person_item1.total)
+    assert_equal(8.0, @event1.total_person("Paul"))
   end
 
   def test_Paul_and_Will_shared_one_sandwich
-    @event1.add_person_item("Paul", 0.5, "Sandwich")
-    @event1.add_person_item("Will", 0.5, "Sandwich")
+    @event1.add_person_item("Paul", :quantity, 0.5, "Sandwich")
+    @event1.add_person_item("Will", :quantity, 0.5, "Sandwich")
 
     person_item1 = @event1.persons_itens[0]
     assert_equal("Paul", person_item1.person.name)
-    assert_equal(0.5, person_item1.count)
-    assert_equal(2.0, person_item1.total)
+    assert_equal(:quantity, person_item1.share_type)
+    assert_equal(0.5,    person_item1.share_value)
 
     person_item2 = @event1.persons_itens[1]
     assert_equal("Will", person_item2.person.name)
-    assert_equal(0.5, person_item2.count)
-    assert_equal(2.0, person_item2.total)
+    assert_equal(:quantity, person_item2.share_type)
+    assert_equal(0.5,    person_item2.share_value)
+
+    assert_equal(2.0,    @event1.total_person("Paul"))
+    assert_equal(2.0,    @event1.total_person("Will"))
   end
+
+  def test_Paul_had_all_beers
+    @event1.add_person_item("Paul", :proportion, 1, "Beer")
+
+    person_item1 = @event1.persons_itens[0]
+    assert_equal("Paul", person_item1.person.name)
+    assert_equal(48.0, @event1.total_person("Paul"))
+  end
+
+  def test_Paul_had_half_of_beers
+    @event1.add_person_item("Paul", :proportion, 0.5, "Beer")
+
+    person_item1 = @event1.persons_itens[0]
+    assert_equal("Paul", person_item1.person.name)
+    assert_equal(24.0, @event1.total_person("Paul"))
+  end
+
+  def test_everybody_shared_the_beers
+    @event1.add_person_item("Paul", :equally, 0, "Beer")
+    @event1.add_person_item("Will", :equally, 0, "Beer")
+    @event1.add_person_item("Jane", :equally, 0, "Beer")
+
+    @event1.calculate_total
+    assert_equal(16.0, @event1.total_person("Paul"))
+    assert_equal(16.0, @event1.total_person("Will"))
+    assert_equal(16.0, @event1.total_person("Jane"))
+  end
+
 
 end

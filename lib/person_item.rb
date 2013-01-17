@@ -1,14 +1,11 @@
 class PersonItem
-  attr_accessor :person, :item, :count
+  attr_accessor :person, :item, :share_type, :share_value
 
   def initialize(person, item)
     @person = person
     @item = item
-    @count = 0.0
-  end
-
-  def total
-    return @item.product.price * @count
+    @share_type = :value
+    @share_value = 0
   end
 
 end

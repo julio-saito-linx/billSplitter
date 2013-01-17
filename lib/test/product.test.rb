@@ -6,7 +6,7 @@ require "redgreen"
 class TestProduct < Test::Unit::TestCase
 
   def setup
-    @product1 = Product.new("Pedaco de Pizza de Mussarela", 10)
+    @product1 = Product.new("Mussarela's Pizza Part", 10)
   end
 
   def test_must_have_a_description
