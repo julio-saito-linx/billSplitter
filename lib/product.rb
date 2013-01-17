@@ -1,8 +1,8 @@
 class Product
-  attr_accessor :description, :unit_price
+  attr_accessor :description, :price
 
-  def initialize(description, unit_price)
+  def initialize(description, price)
     @description = description
-    @unit_price = unit_price
+    @price = price
   end
 end
