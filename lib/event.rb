@@ -1,18 +1,18 @@
 class Event
-  attr_accessor :name, :place, :persons, :itens, :persons_itens, :tips
+  attr_accessor :name, :place, :persons, :event_itens, :persons_products, :tip
 
   def initialize(name)
     @name = name
     @persons = []
-    @itens = []
-    @persons_itens = []
-    @tips = 0.0
+    @event_itens = []
+    @persons_products = []
+    @tip = 0.0
   end
 
   def add_item(name, price, item_count)
     product1 = Product.new(name, price)
     item1 = EventItem.new(product1, item_count)
-    @itens.unshift(item1)
+    @event_itens.unshift(item1)
   end
 
   def add_person(name)
@@ -20,82 +20,85 @@ class Event
     @persons.unshift(p1)
   end
 
-  def add_person_item(person_name, share_type, share_value, product_description)
-    person_item = @persons_itens.find {|x|
-                     x.item.product.description == product_description &&
-                     x.person.name == person_name}
+  def add_person_product(person_name, share_type, share_value, product_description)
+    #get person and the product
+    person = @persons.find {|x| x.name == person_name}
+    event_item = @event_itens.find {|x| x.product.description == product_description}
+    product = event_item.product
 
-    if person_item.nil?
-      person = @persons.find {|x| x.name == person_name}
-      item = @itens.find {|x| x.product.description == product_description}
-
-      person_item = PersonItem.new(person, item)
-      @persons_itens.push(person_item)
-    end
-
-    person_item.share_type = share_type
-    person_item.share_value += share_value
+    #add to the list
+    person_product = PersonProduct.new(person, product, share_type, share_value)
+    @persons_products.push(person_product)
   end
 
   def total
     acumulator = 0
-    @itens.each do |itens|
-      acumulator += itens.total
+    @event_itens.each do |event_itens|
+      acumulator += event_itens.total
     end
-    acumulator + acumulator * @tips
+    acumulator + acumulator * @tip
   end
 
   def total_person(person_name)
-    calculate_total
     person = @persons.find {|x| x.name == person_name}
     person.debt
   end
 
-  def calculate_total
-    #clear all old debts
+  def clear_all_debts
+    #clear all old debts from each person
     @persons.each do |p1|
       p1.debt = 0
     end
+  end
+
+  def calculate_total
+    clear_all_debts
 
     #iterates each product
-    @itens.each do |item|
-      product = item.product
-      product_total_value = item.total
+    @event_itens.each do |event_item|
+      product = event_item.product
+      product_total_value = event_item.total
 
-      #find_all person_item for this product
-      persons_item = @persons_itens.find_all do |x|
-       x.item.product.description == product.description
+      #find_all person_product for this product
+      persons_product = @persons_products.find_all do |x|
+       x.product.description == product.description
       end
 
-      #calculate total under this priority quantity, value, proportion, equality
-      #quantity
-      pi_by_quantity = persons_item.find_all {|x| x.share_type == :quantity}
-      pi_by_quantity.each do |p_item|
-        p_item.person.debt += p_item.share_value * p_item.item.product.price
-        product_total_value -= p_item.person.debt
-      end
+      #calculate total under this priority
+       # 1 - value
+       # 2 - quantity
+       # 3 - proportion
+       # 4 - equality
 
       #value
-      pi_by_value = persons_item.find_all {|x| x.share_type == :value}
+      pi_by_value = persons_product.find_all {|x| x.share_type == :value}
       pi_by_value.each do |p_item|
         p_item.person.debt += p_item.share_value
         product_total_value -= p_item.person.debt
       end
 
+      #quantity
+      pi_by_quantity = persons_product.find_all {|x| x.share_type == :quantity}
+      pi_by_quantity.each do |p_item|
+        p_item.person.debt += p_item.share_value * p_item.product.price
+        product_total_value -= p_item.person.debt
+      end
+
       #proportion
-      pi_by_proportion = persons_item.find_all {|x| x.share_type == :proportion}
+      pi_by_proportion = persons_product.find_all {|x| x.share_type == :proportion}
       pi_by_proportion.each do |p_item|
         p_item.person.debt += p_item.share_value * product_total_value
         product_total_value -= p_item.person.debt
       end
 
-      #equally
-      pi_by_equally = persons_item.find_all {|x| x.share_type == :equally}
-      persons_sharing = pi_by_equally.count
-      pi_by_equally.each do |p_item|
+      #equality
+      pi_by_equality = persons_product.find_all {|x| x.share_type == :equality}
+      persons_sharing = pi_by_equality.count
+      pi_by_equality.each do |p_item|
         p_item.person.debt += product_total_value / persons_sharing
       end
     end
   end
 
 end
+
