@@ -9,6 +9,9 @@ class Event
     @event_itens = []
     @persons_products = []
     @tip = 0.0
+
+    @log = Logger.new(STDOUT)
+    @log.level = Logger::INFO
   end
 
   def add_item(name, price, item_count)
@@ -42,12 +45,11 @@ class Event
   end
 
   def tip_value
-    log = Logger.new(STDOUT)
-    log.level = Logger::DEBUG
-    log.debug("Created logger")
-    log.info("Program started")
-    log.error("Nothing to do!")
-    log.fatal("Nothing to do!")
+    @log.debug("Created logger")
+    @log.warn("Created logger")
+    @log.info("Program started")
+    @log.error("Nothing to do!")
+    @log.fatal("Nothing to do!")
 
     total * tip
   end
