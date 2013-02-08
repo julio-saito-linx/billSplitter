@@ -11,7 +11,7 @@ class TestEvent < Test::Unit::TestCase
   def setup
     @event1 = Event.new("Joana's birthday")
 
-    @event1.place = Place.new("Elevateds Mountains")
+    @event1.name = "Elevateds Mountains"
 
     @event1.add_person("Paul")
     @event1.add_person("Will")
@@ -20,6 +20,8 @@ class TestEvent < Test::Unit::TestCase
     @event1.add_item("Sandwich", 4.0, 2)
     @event1.add_item("Water", 5.0, 2)
     @event1.add_item("Beer", 6.0, 8)
+
+    @event1.tip = 0.1
   end
 
   def test_must_have_a_name
@@ -39,12 +41,11 @@ class TestEvent < Test::Unit::TestCase
   end
 
   def test_event_total_consumed
-    assert_equal(66.0, @event1.total)
+    assert_equal(72.6, @event1.total)
   end
 
   def test_event_total_consumed_plus_tips
-    @event1.tip = 0.1
-    assert_equal(72.6, @event1.total)
+    assert_equal(6.6, @event1.tip_value)
   end
 
   def test_Paul_eated_a_sandwich

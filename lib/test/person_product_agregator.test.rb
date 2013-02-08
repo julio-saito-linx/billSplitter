@@ -22,8 +22,6 @@ class TestPersonProductAgregator < Test::Unit::TestCase
 
     assert_equal(21, ppAgregator.total("Beer", :quantity))
     assert_equal(3.0, ppAgregator.total("Beer", :value))
-    assert_equal(0, ppAgregator.total("Beer", :proportion))
-    assert_equal(0, ppAgregator.total("Beer", :equality))
   end
 
   def test_total_by_proportion_considers_the_last_one

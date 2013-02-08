@@ -1,5 +1,7 @@
+require 'logger'
+
 class Event
-  attr_accessor :name, :place, :persons, :event_itens, :persons_products, :tip
+  attr_accessor :name, :persons, :event_itens, :persons_products, :tip
 
   def initialize(name)
     @name = name
@@ -36,7 +38,22 @@ class Event
     @event_itens.each do |event_itens|
       acumulator += event_itens.total
     end
-    acumulator + acumulator * @tip
+    acumulator + acumulator
+  end
+
+  def tip_value
+    log = Logger.new(STDOUT)
+    log.level = Logger::DEBUG
+    log.debug("Created logger")
+    log.info("Program started")
+    log.error("Nothing to do!")
+    log.fatal("Nothing to do!")
+
+    total * tip
+  end
+
+  def total_plus_tip
+    total + tip_value
   end
 
   def total_person(person_name)
