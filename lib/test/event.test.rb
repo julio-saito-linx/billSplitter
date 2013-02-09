@@ -135,24 +135,32 @@ class TestEvent < Test::Unit::TestCase
   end
 
 
-  # def test_nobody_pays_the_same
-  #   @event1.add_person_product("Paul", :value,  4.0, "Beer")
-  #   @event1.add_person_product("Paul", :quantity, 2, "Beer")
+  def test_nobody_pays_the_same
+    @event1.add_person_product("Paul", :value,  4.0, "Beer")
+    @event1.add_person_product("Paul", :quantity, 2, "Beer")
 
-  #   @event1.calculate_total
-  #   assert_equal(12.0, @event1.total_person("Paul"))
-  # end
+    @event1.calculate_total
+    assert_equal(16.0, @event1.total_person("Paul"))
+  end
 
-  # def test_nobody_pays_the_same
-  #   @event1.add_person_product("Paul", :value, 4.0, "Beer")
-  #   @event1.add_person_product("Paul", :quantity, 2, "Beer")
-  #   @event1.add_person_product("Will", :proportion, 0.50, "Beer")
-  #   @event1.add_person_product("Jane", :equality, 0, "Beer")
+  def test_nobody_wants_to_pays_the_same_way
+    #total = 48
 
-  #   @event1.calculate_total
-  #   assert_equal(20.0, @event1.total_person("Paul"))
-  #   assert_equal(14.0, @event1.total_person("Will"))
-  #   assert_equal(14.0, @event1.total_person("Jane"))
-  # end
+    @event1.add_person_product("Paul", :value, 4.0, "Beer")
+    @event1.add_person_product("Paul", :quantity, 2, "Beer")
+    #16
+
+    @event1.add_person_product("Will", :proportion, 0.50, "Beer")
+    #48-16=32
+    #32/2 = 16
+
+    @event1.add_person_product("Jane", :equality, 0, "Beer")
+    #20 / 3 = 6.66
+
+    @event1.calculate_total
+    assert_equal(16.00, @event1.total_person("Paul"))
+    assert_equal(16.00, @event1.total_person("Will"))
+    assert_equal(16.00, @event1.total_person("Jane"))
+  end
 
 end

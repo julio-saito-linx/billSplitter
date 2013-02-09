@@ -1,4 +1,7 @@
 require 'util/simple_logger'
+require 'eventItem'
+require 'product'
+require 'person'
 
 class Event
   attr_accessor :name, :persons, :event_itens, :persons_products, :tip
@@ -10,7 +13,7 @@ class Event
     @persons_products = []
     @tip = 0.0
 
-    SimpleLogger.new(STDOUT, Logger::ERROR)
+    SimpleLogger.new(STDOUT, Logger::INFO)
   end
 
   def add_item(name, price, item_count)
@@ -68,16 +71,21 @@ class Event
   end
 
   def calculate_total
+    $log.info("calculate_total()")
     clear_all_debts
 
     #iterates each product
     @event_itens.each do |event_item|
+      $log.info("------------------")
+      $log.info("product = #{event_item.product.description}")
       product = event_item.product
+
+      $log.info("  product_total_value = #{event_item.total}")
       product_total_value = event_item.total
 
       #find_all person_product for this product
       persons_product = @persons_products.find_all do |x|
-       x.product.description == product.description
+        x.product.description == product.description
       end
 
       #calculate total under this priority
@@ -89,31 +97,55 @@ class Event
       #value
       pi_by_value = persons_product.find_all {|x| x.share_type == :value}
       pi_by_value.each do |p_item|
-        p_item.person.debt += p_item.share_value
-        product_total_value -= p_item.person.debt
+        total_for_this_share_type = p_item.share_value
+
+        $log.info("     (:value) #{p_item.person.name} = #{total_for_this_share_type}")
+        p_item.person.debt += total_for_this_share_type
+        product_total_value -= total_for_this_share_type
       end
+
+      $log.info("  product_total_value = #{product_total_value}") unless pi_by_value.empty?
 
       #quantity
       pi_by_quantity = persons_product.find_all {|x| x.share_type == :quantity}
       pi_by_quantity.each do |p_item|
-        p_item.person.debt += p_item.share_value * p_item.product.price
-        product_total_value -= p_item.person.debt
+        total_for_this_share_type = p_item.share_value * p_item.product.price
+
+        $log.info("     (:quantity) #{p_item.person.name} = #{total_for_this_share_type}")
+        p_item.person.debt += total_for_this_share_type
+        product_total_value -= total_for_this_share_type
       end
+
+      $log.info("  product_total_value = #{product_total_value}") unless pi_by_value.empty?
 
       #proportion
       pi_by_proportion = persons_product.find_all {|x| x.share_type == :proportion}
       pi_by_proportion.each do |p_item|
-        p_item.person.debt += p_item.share_value * product_total_value
-        product_total_value -= p_item.person.debt
+        total_for_this_share_type = p_item.share_value * product_total_value
+
+        $log.info("     (:proportion) #{p_item.person.name} = #{total_for_this_share_type}")
+        p_item.person.debt += total_for_this_share_type
+        product_total_value -= total_for_this_share_type
       end
+
+      $log.info("  product_total_value = #{product_total_value}") unless pi_by_value.empty?
 
       #equality
       pi_by_equality = persons_product.find_all {|x| x.share_type == :equality}
       persons_sharing = pi_by_equality.count
+      # is calculated outside
+      total_for_this_share_type = product_total_value / persons_sharing
       pi_by_equality.each do |p_item|
-        p_item.person.debt += product_total_value / persons_sharing
+        $log.info("     (:equality) #{p_item.person.name} = #{total_for_this_share_type}")
+        p_item.person.debt += total_for_this_share_type
+        product_total_value -= total_for_this_share_type
       end
+
+      $log.info("  product_total_value = #{product_total_value}") unless pi_by_value.empty?
+      $log.info("  produ( final )value = #{product_total_value}") unless product_total_value == event_item.total
+
     end
+
   end
 
 end
