@@ -1,4 +1,4 @@
-require 'logger'
+require 'util/simple_logger'
 
 class Event
   attr_accessor :name, :persons, :event_itens, :persons_products, :tip
@@ -10,8 +10,7 @@ class Event
     @persons_products = []
     @tip = 0.0
 
-    @log = Logger.new(STDOUT)
-    @log.level = Logger::INFO
+    SimpleLogger.new(STDOUT, Logger::ERROR)
   end
 
   def add_item(name, price, item_count)
@@ -37,21 +36,19 @@ class Event
   end
 
   def total
-    acumulator = 0
+    $log.info("total()")
+
+    accumulator = 0
     @event_itens.each do |event_itens|
-      acumulator += event_itens.total
+      accumulator += event_itens.total
+      $log.info("each: #{event_itens.total}")
     end
-    acumulator + acumulator
+    $log.info("total: #{accumulator}")
+    accumulator
   end
 
   def tip_value
-    @log.debug("Created logger")
-    @log.warn("Created logger")
-    @log.info("Program started")
-    @log.error("Nothing to do!")
-    @log.fatal("Nothing to do!")
-
-    total * tip
+    (total * tip).round(2)
   end
 
   def total_plus_tip

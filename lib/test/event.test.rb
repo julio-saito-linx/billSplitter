@@ -28,10 +28,6 @@ class TestEvent < Test::Unit::TestCase
     assert_not_nil(@event1.name)
   end
 
-  def test_happens_at_a_place
-    assert_not_nil(@event1.place)
-  end
-
   def test_there_are_two_persons
     assert_equal(3, @event1.persons.count)
   end
@@ -40,12 +36,16 @@ class TestEvent < Test::Unit::TestCase
     assert_equal(3, @event1.event_itens.count)
   end
 
-  def test_event_total_consumed
-    assert_equal(72.6, @event1.total)
+  def test_event_total
+    assert_equal(66.0, @event1.total)
   end
 
-  def test_event_total_consumed_plus_tips
+  def test_event_tips
     assert_equal(6.6, @event1.tip_value)
+  end
+
+  def test_event_total_lus_tips
+    assert_equal(72.6, @event1.total_plus_tip)
   end
 
   def test_Paul_eated_a_sandwich
@@ -84,7 +84,7 @@ class TestEvent < Test::Unit::TestCase
     assert_equal(48.0, @event1.total_person("Paul"))
   end
 
-  def test_Paul_total_only_sandwiches
+  def test_Paul_eated_two_sandwiches
     @event1.add_person_product("Paul", :quantity, 1, "Sandwich")
     @event1.add_person_product("Paul", :quantity, 1, "Sandwich")
 
@@ -134,15 +134,6 @@ class TestEvent < Test::Unit::TestCase
     assert_equal(16.0, @event1.total_person("Jane"))
   end
 
-
-  # def test_Paul_eated_one_more_sandwich
-  #   @event1.add_person_product("Paul", :quantity, 1, "Sandwich")
-  #   @event1.add_person_product("Paul", :quantity, 1, "Sandwich")
-
-  #   person_product1 = @event1.persons_products[0]
-  #   assert_equal(:quantity, person_product1.share_type)
-  #   assert_equal(2, person_product1.share_value)
-  # end
 
   # def test_nobody_pays_the_same
   #   @event1.add_person_product("Paul", :value,  4.0, "Beer")
